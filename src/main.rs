@@ -20,7 +20,7 @@ struct GeocodingResponse {
     results: Option<Vec<GeocodingResult>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 struct GeocodingResult {
     latitude: f64,
     longitude: f64,
@@ -66,7 +66,7 @@ async fn weather(query: web::Query<WeatherQuery>) -> HttpResponse {
     };
 
     let result = match geo_data.results {
-        Some(results) if !results.is_empty() => &results[0],
+        Some(results) if !results.is_empty() => results[0].clone(), // Clone the result to own it
         _ => return HttpResponse::NotFound().body(format!("City '{}' not found", city)),
     };
 
