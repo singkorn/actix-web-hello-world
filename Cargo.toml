@@ -12,3 +12,5 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 reqwest = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
 actix-web-httpauth = "0.8"
+shuttle-persist = "0.51.0"
+uuid = { version = "1.4", features = ["v4", "serde"] }

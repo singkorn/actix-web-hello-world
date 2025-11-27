@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use actix_web_httpauth::middleware::HttpAuthentication;
 
 mod auth;
+mod tokens;
 
 #[derive(Deserialize)]
 struct WeatherQuery {
@@ -100,11 +101,15 @@ async fn weather(query: web::Query<WeatherQuery>) -> HttpResponse {
 }
 
 #[shuttle_runtime::main]
-async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
+async fn main(
+    #[shuttle_persist::Persist] persist: shuttle_persist::PersistInstance,
+) -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
     let config = move |cfg: &mut ServiceConfig| {
         let auth = HttpAuthentication::bearer(auth::validator);
         
-        cfg.service(hello_world)
+        cfg.app_data(web::Data::new(persist.clone()))
+           .service(hello_world)
+           .service(tokens::create_token)
            .service(
                web::scope("")
                    .wrap(auth)
